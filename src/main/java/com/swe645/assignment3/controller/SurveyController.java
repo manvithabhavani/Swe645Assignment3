@@ -18,7 +18,7 @@ import com.swe645.assignment3.service.SurveyService;
 
 
 @RestController
-@RequestMapping("/surveys")
+@RequestMapping("/api/surveys")
 public class SurveyController {
 	
 	private SurveyService surveyService;
