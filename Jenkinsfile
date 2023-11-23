@@ -13,7 +13,8 @@ agent any
      stage('Installing Maven'){
         steps{
             script{
-                sh 'mvn clean install -DskipTests'
+                sh 'mvn clean'
+                sh 'mvn install -DskipTests'
                 
             }
         }
