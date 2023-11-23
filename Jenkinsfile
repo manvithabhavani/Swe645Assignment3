@@ -3,7 +3,7 @@ pipeline{
     environment {
         registry = "sagar21999/swe645assignment3"
         registryCredential = 'dockerhub'
-        def dateTag = new Date().format("yyyyMMdd-HHmmss")
+        TIMESTAMP = new Date().format("yyyyMMdd_HHmmss")
 	}
 agent any
     tools{
@@ -18,18 +18,25 @@ agent any
             }
         }
      }
-     stage('Build and Push Docker Image'){
-        steps{
-            script {
-                  docker.withRegistry('',registryCredential) {
-                        def image = docker.build('sagar21999/swe645assignment3:'+ dateTag, '. --no-cache')
-                        docker.withRegistry('',registryCredential) {
-                            image.push()
-                        }
-                    }
+     stage('Build Docker Image') {
+         steps {
+            script{
+               docker.withRegistry('',registryCredential){
+                  def customImage = docker.build("sagar21999/swe645assignment3:${env.TIMESTAMP}")
+               }
             }
-        }
-     }
+         }
+      }
+
+      stage('Push Image to Dockerhub') {
+         steps {
+            script{
+               docker.withRegistry('',registryCredential){
+                  sh "docker push sagar21999/swe645assignment3:${env.TIMESTAMP}"
+               }
+            }
+         }
+      }
       stage('Deploying to Nodeport in Rancher '){
         steps{
             script {
