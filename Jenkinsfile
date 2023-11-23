@@ -1,55 +1,36 @@
-pipeline{
-    
+pipeline {
+    agent any
     environment {
-        registry = "sagar21999/swe645assignment3"
-        registryCredential = 'dockerhub'
-        TIMESTAMP = new Date().format("yyyyMMdd_HHmmss")
-	}
-agent any
-    tools{
-        maven 'Maven 3.9.4'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
-    stages{
-     stage('Installing Maven'){
-        steps{
-            script{
-                sh 'mvn clean'
-                sh 'mvn install -DskipTests'
-                
+    stages {
+        stage('Build') {
+            steps {
+                sh 'rm -rf *.var'
+                sh 'jar -cvf Survey-0.0.1-SNAPSHOT.war -C "Survey/src/main" .'     
+                sh 'docker build -t sagar21999/swe645assignment3:latest .'
             }
         }
-     }
-     stage('Build Docker Image') {
-         steps {
-            script{
-               docker.withRegistry('',registryCredential){
-                  def customImage = docker.build("sagar21999/swe645assignment3:${env.TIMESTAMP}")
-               }
-            }
-         }
-      }
-
-      stage('Push Image to Dockerhub') {
-         steps {
-            script{
-               docker.withRegistry('',registryCredential){
-                  sh "docker push sagar21999/swe645assignment3:${env.TIMESTAMP}"
-               }
-            }
-         }
-      }
-      stage('Deploying to Nodeport in Rancher '){
-        steps{
-            script {
-                  sh 'kubectl set image deployment/deploy1 container-0=sagar21999/swe645assignment3:'+dateTag
+        stage('Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-     }
-     }
- 
-  post {
-	  always {
-			sh 'docker logout'
-		}
-	}    
+        stage("Push image to docker hub") {
+            steps {
+                sh 'docker push sagar21999/swe645assignment3:latest'
+            }
+        }
+        stage("deploying on k8") {
+            steps {
+                sh 'kubectl set image deployment/deploy1 container-0=sagar21999/swe645assignment3:latest -n default'
+                sh 'kubectl rollout restart deploy deploy1 -n default'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout'
+        }
+    }
 }
