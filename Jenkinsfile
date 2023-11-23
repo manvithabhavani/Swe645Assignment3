@@ -1,10 +1,12 @@
 pipeline {
-    agent any
+    
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
-   tools {
-    maven 'Maven 3.9.4'
+    agent any
+    tools {
+     maven 'Maven 3.9.4'
+    }
     stages {
         stage('Maven Clean') {
             steps {
