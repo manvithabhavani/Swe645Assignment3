@@ -7,7 +7,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'rm -rf *.var'
-                sh 'jar -cvf Survey-0.0.1-SNAPSHOT.war -C "Survey/src/main" .'     
+                sh 'jar -cvf Survey-0.0.1-SNAPSHOT.war -C "src/main" .'     
                 sh 'docker build -t sagar21999/swe645assignment3:latest .'
             }
         }
