@@ -63,7 +63,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.11.8</version> <!-- Updated version with Java 17 support -->
+            <version>3.9.8</version> <!-- Updated version with Java 17 support -->
             <configuration>
                 <release>17</release> <!-- Specify Java version -->
             </configuration>
